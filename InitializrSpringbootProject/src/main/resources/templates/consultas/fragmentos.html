@@ -1,0 +1,114 @@
+<!-- Fragmento 1: formularios de consulta -->
+<section th:fragment="consultas" class="container py-4">
+    <div class="row row-cols-1 row-cols-md-4 g-3">
+
+        <!-- Consulta derivada (sin parámetros) -->
+        <div>
+            <form method="post" th:action="@{/consultas/consultaDerivada}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="card h-100">
+                    <div class="card-header text-center text-white bg-primary">
+                        <h5 th:text="#{consultas.derivadas}"></h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted text-center mb-0" th:text="#{consultas.derivadas.descripcion}"></p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa-solid fa-magnifying-glass"></i> [[#{boton.buscar}]]
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Consulta JPQL (por nombre) -->
+        <div>
+            <form method="post" th:action="@{/consultas/consultaJPQL}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="card h-100">
+                    <div class="card-header text-center text-white bg-warning">
+                        <h5 th:text="#{consultas.jpql}"></h5>
+                    </div>
+                    <div class="card-body">
+                        <label class="form-label" th:text="#{campo.nombre}"></label>
+                        <input type="text" name="nombre" class="form-control"
+                               th:placeholder="#{evento.nombre.placeholder}" required/>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="submit" class="btn btn-warning text-white">
+                            <i class="fa-solid fa-magnifying-glass"></i> [[#{boton.buscar}]]
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Consulta SQL (por rango de fechas) -->
+        <div>
+            <form method="post" th:action="@{/consultas/consultaSQL}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <div class="card h-100">
+                    <div class="card-header text-center text-white bg-success">
+                        <h5 th:text="#{consultas.sql}"></h5>
+                    </div>
+                    <div class="card-body">
+                        <label class="form-label" th:text="#{campo.fecha.inicio}"></label>
+                        <input type="date" name="inicio" class="form-control mb-2" required/>
+                        <label class="form-label" th:text="#{campo.fecha.fin}"></label>
+                        <input type="date" name="fin" class="form-control" required/>
+                    </div>
+                    <div class="card-footer text-center">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-solid fa-magnifying-glass"></i> [[#{boton.buscar}]]
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Totales -->
+        <div>
+            <div class="card h-100 text-center bg-dark text-white">
+                <div class="card-header">
+                    <h5 th:text="#{consultas.resumen}"></h5>
+                </div>
+                <div class="card-body d-flex flex-column justify-content-center">
+                    <h2 class="display-4" th:text="${#lists.size(eventos)}">0</h2>
+                    <p th:text="#{evento.total}"></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- Fragmento 2: tarjetas de resultados -->
+<section th:fragment="tarjetas" class="container py-4">
+    <div th:if="${consultaRealizada == true and (eventos == null or #lists.isEmpty(eventos))}"
+         class="alert alert-info text-center">
+        <i class="fas fa-info-circle me-1"></i> [[#{lista.vacia}]]
+    </div>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4"
+         th:if="${eventos != null and !#lists.isEmpty(eventos)}">
+        <div th:each="e : ${eventos}" class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="d-flex justify-content-center align-items-center bg-light p-3" style="height: 160px;">
+                    <span class="text-muted fs-5" th:text="${e.nombre}"></span>
+                </div>
+                <div class="card-header bg-white">
+                    <h5 class="card-title text-center text-truncate mb-0" th:text="${e.nombre}"></h5>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <p class="card-text text-muted mb-auto" th:text="${e.descripcion}"></p>
+                </div>
+                <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                    <span th:text="${#temporals.format(e.fecha, 'dd/MM/yyyy')}"></span>
+                    <span th:if="${e.activo}" class="badge bg-success" th:text="#{campo.activo.si}"></span>
+                    <span th:unless="${e.activo}" class="badge bg-secondary" th:text="#{campo.activo.no}"></span>
+                    <span class="badge bg-info" th:text="|${e.capacidad} #{campo.capacidad}|"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

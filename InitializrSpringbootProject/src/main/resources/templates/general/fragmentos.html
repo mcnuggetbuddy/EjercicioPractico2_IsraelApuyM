@@ -1,0 +1,127 @@
+<!-- Fragmento #1 que irá en el head de todas las páginas, así se incluye todo lo necesario de configuración-->
+<head th:fragment="head">
+    <title>Plataforma de Eventos</title>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/png" sizes="16x16" href="/fav/favicon-16x16.png"/>
+    <link rel="icon" type="image/png" sizes="32x32" href="/fav/favicon-32x32.png"/>
+    <link rel="icon" type="image/png" sizes="96x96" href="/fav/favicon-96x96.png"/>
+    <link rel="icon" type="image/png" sizes="256x256" href="/fav/favicon-256x256.png"/>
+    <link th:href="@{/webjars/bootstrap/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/webjars/font-awesome/css/all.css}" rel="stylesheet"/>
+    <script th:src="@{/js/rutinas.js}"></script>
+    <script th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<!-- Fragmento #2: Header con Navbar -->
+<header th:fragment="header" class="d-print-none">
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark p-0">
+        <div class="container">
+            <a th:href="@{/}" class="navbar-brand" th:text="#{app.nombre}">Plataforma de Eventos</a>
+            <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                <ul class="navbar-nav">
+                    <!-- ADMIN: usuarios, roles, eventos (CRUD), consultas -->
+                    <li class="nav-item px-2" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a class="nav-link" th:href="@{/usuario/listado}">
+                            <i class="fas fa-users"></i> [[#{nav.usuarios}]]
+                        </a>
+                    </li>
+                    <li class="nav-item px-2" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a class="nav-link" th:href="@{/rol/listado}">
+                            <i class="fas fa-user-tag"></i> [[#{nav.roles}]]
+                        </a>
+                    </li>
+                    <li class="nav-item px-2" sec:authorize="hasAnyRole('ROLE_ADMIN','ROLE_ORGANIZADOR')">
+                        <a class="nav-link" th:href="@{/evento/listado}">
+                            <i class="fas fa-calendar-alt"></i> [[#{nav.eventos}]]
+                        </a>
+                    </li>
+                    <li class="nav-item px-2" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" th:href="@{/consultas/listado}">
+                            <i class="fas fa-search"></i> [[#{nav.consultas}]]
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav" sec:authorize="!isAuthenticated()">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/login}">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span class="ms-1" th:text="#{nav.login}">Login</span>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav" sec:authorize="isAuthenticated()">
+                    <li class="nav-item my-auto">
+                        <a class="nav-link">
+                            <span sec:authentication="name" class="ms-1"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item my-auto">
+                        <form method="post" th:action="@{/logout}">
+                            <button class="btn nav-link" type="submit">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span class="ms-1" th:text="#{nav.logout}">Logout</span>
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <section class="py-2 bg-primary text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h1><i class="fas fa-calendar-check"></i> [[#{app.titulo}]]</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+</header>
+
+<!-- Fragmento #3: Footer -->
+<footer th:fragment="footer" class="p-2 mt-5 bg-dark text-white d-print-none">
+    <p class="text-center mb-0" th:text="#{app.footer}">Plataforma de Eventos &copy; 2026 - Todos los derechos reservados</p>
+</footer>
+
+<!-- Fragmento #4: Toast para mensajes -->
+<section th:fragment="mensajeToast">
+    <div aria-live="polite" aria-atomic="true"
+         class="position-fixed top-50 start-50 translate-middle" style="z-index: 1080;">
+ 
+        <!-- Toast de error -->
+        <div th:if="${error}" class="toast show"
+             role="alert" aria-live="assertive" aria-atomic="true"
+             data-bs-autohide="true">
+            <div class="toast-header text-white bg-danger">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <strong class="me-auto ms-1" th:text="#{toast.error}">Error</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                <p th:text="${error}"></p>
+            </div>
+        </div>
+ 
+        <!-- Toast de éxito -->
+        <div th:if="${exitoso}" class="toast show"
+             role="status" aria-live="polite" aria-atomic="true"
+             data-bs-autohide="true">
+            <div class="toast-header text-white bg-success">
+                <i class="fa-solid fa-circle-check"></i>
+                <strong class="me-auto ms-1" th:text="#{toast.correcto}">Correcto</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                <p th:text="${exitoso}"></p>
+            </div>
+        </div>
+    </div>
+</section>
